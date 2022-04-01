@@ -1,4 +1,4 @@
-# hill climbing search with random restarts of the ackley objective function
+# hill climbing search of the ackley objective function
 from numpy import asarray
 from numpy import exp
 from numpy import sqrt
@@ -24,9 +24,11 @@ def in_bounds(point, bounds):
 	return True
 
 # hill climbing local search algorithm
-def hillclimbing(objective, bounds, n_iterations, step_size, start_pt):
-	# store the initial point
-	solution = start_pt
+def hillclimbing(objective, bounds, n_iterations, step_size):
+	# generate an initial point
+	solution = None
+	while solution is None or not in_bounds(solution, bounds):
+		solution = bounds[:, 0] + rand(len(bounds)) * (bounds[:, 1] - bounds[:, 0])
 	# evaluate the initial point
 	solution_eval = objective(solution)
 	# run the hill climb
@@ -41,36 +43,19 @@ def hillclimbing(objective, bounds, n_iterations, step_size, start_pt):
 		if candidte_eval <= solution_eval:
 			# store the new point
 			solution, solution_eval = candidate, candidte_eval
+			# report progress
+			print('>%d f(%s) = %.5f' % (i, solution, solution_eval))
 	return [solution, solution_eval]
-
-# hill climbing with random restarts algorithm
-def random_restarts(objective, bounds, n_iter, step_size, n_restarts):
-	best, best_eval = None, 1e+10
-	# enumerate restarts
-	for n in range(n_restarts):
-		# generate a random initial point for the search
-		start_pt = None
-		while start_pt is None or not in_bounds(start_pt, bounds):
-			start_pt = bounds[:, 0] + rand(len(bounds)) * (bounds[:, 1] - bounds[:, 0])
-		# perform a stochastic hill climbing search
-		solution, solution_eval = hillclimbing(objective, bounds, n_iter, step_size, start_pt)
-		# check for new best
-		if solution_eval < best_eval:
-			best, best_eval = solution, solution_eval
-			print('Restart %d, best: f(%s) = %.5f' % (n, best, best_eval))
-	return [best, best_eval]
 
 # seed the pseudorandom number generator
 seed(1)
 # define range for input
 bounds = asarray([[-5.0, 5.0], [-5.0, 5.0]])
 # define the total iterations
-n_iter = 1000
+n_iterations = 1000
 # define the maximum step size
 step_size = 0.05
-# total number of random restarts
-n_restarts = 30
 # perform the hill climbing search
-best, score = random_restarts(objective, bounds, n_iter, step_size, n_restarts)
+best, score = hillclimbing(objective, bounds, n_iterations, step_size)
 print('Done!')
 print('f(%s) = %f' % (best, score))
