@@ -1,61 +1,98 @@
-# hill climbing search of the ackley objective function
-from numpy import asarray
-from numpy import exp
-from numpy import sqrt
-from numpy import cos
-from numpy import e
-from numpy import pi
-from numpy.random import randn
-from numpy.random import rand
-from numpy.random import seed
+from sys import exit
 
-# objective function
-def objective(v):
-	x, y = v
-	return -20.0 * exp(-0.2 * sqrt(0.5 * (x**2 + y**2))) - exp(0.5 * (cos(2 * pi * x) + cos(2 * pi * y))) + e + 20
+route = [
+	{'dari': 'jakarta', 'ke': 'depok', 'jarak': 25},
+	{'dari': 'jakarta', 'ke': 'bekasi', 'jarak': 35},
+	{'dari': 'jakarta', 'ke': 'tangerang', 'jarak': 35},
 
-# check if a point is within the bounds of the search
-def in_bounds(point, bounds):
-	# enumerate all dimensions of the point
-	for d in range(len(bounds)):
-		# check if out of bounds for this dimension
-		if point[d] < bounds[d, 0] or point[d] > bounds[d, 1]:
-			return False
-	return True
+	{'dari': 'bogor', 'ke': 'depok', 'jarak': 25},
+	{'dari': 'bogor', 'ke': 'bekasi', 'jarak': 50},
+	{'dari': 'bogor', 'ke': 'tangerang', 'jarak': 35},
+	{'dari': 'bogor', 'ke': 'cianjur', 'jarak': 50},
+	{'dari': 'bogor', 'ke': 'sukabumi', 'jarak': 50},
 
-# hill climbing local search algorithm
-def hillclimbing(objective, bounds, n_iterations, step_size):
-	# generate an initial point
-	solution = None
-	while solution is None or not in_bounds(solution, bounds):
-		solution = bounds[:, 0] + rand(len(bounds)) * (bounds[:, 1] - bounds[:, 0])
-	# evaluate the initial point
-	solution_eval = objective(solution)
-	# run the hill climb
-	for i in range(n_iterations):
-		# take a step
-		candidate = None
-		while candidate is None or not in_bounds(candidate, bounds):
-			candidate = solution + randn(len(bounds)) * step_size
-		# evaluate candidate point
-		candidte_eval = objective(candidate)
-		# check if we should keep the new point
-		if candidte_eval <= solution_eval:
-			# store the new point
-			solution, solution_eval = candidate, candidte_eval
-			# report progress
-			print('>%d f(%s) = %.5f' % (i, solution, solution_eval))
-	return [solution, solution_eval]
+	{'dari': 'depok', 'ke': 'jakarta', 'jarak': 25},
+	{'dari': 'depok', 'ke': 'bogor', 'jarak': 25},
+	{'dari': 'depok', 'ke': 'bekasi', 'jarak': 35},
+	{'dari': 'depok', 'ke': 'tangerang', 'jarak': 35},
 
-# seed the pseudorandom number generator
-seed(1)
-# define range for input
-bounds = asarray([[-5.0, 5.0], [-5.0, 5.0]])
-# define the total iterations
-n_iterations = 1000
-# define the maximum step size
-step_size = 0.05
-# perform the hill climbing search
-best, score = hillclimbing(objective, bounds, n_iterations, step_size)
-print('Done!')
-print('f(%s) = %f' % (best, score))
+	{'dari': 'tangerang', 'ke': 'jakarta', 'jarak': 35},
+	{'dari': 'tangerang', 'ke': 'depok', 'jarak': 35},
+	{'dari': 'tangerang', 'ke': 'bogor', 'jarak': 35},
+	{'dari': 'tangerang', 'ke': 'serang', 'jarak': 50},
+
+	{'dari': 'bekasi', 'ke': 'jakarta', 'jarak': 35},
+	{'dari': 'bekasi', 'ke': 'bogor', 'jarak': 50},
+	{'dari': 'bekasi', 'ke': 'depok', 'jarak': 35},
+	{'dari': 'bekasi', 'ke': 'karawang', 'jarak': 50},
+]
+
+def cekAsal(kota):
+	exist = False
+	for rute in route:
+		if rute['dari'] == kota:
+			exist = True
+	return exist
+
+def cekRute(asal, tujuan, dict, blacklist = []):
+	data = []
+	for x in dict:
+		if (x['dari'] == asal) and (x['ke'] not in blacklist):
+			print([x['dari'], x['ke']])
+			if x['ke'] == tujuan:
+				data.append(x)
+				break
+			else:
+				dict.remove(x)
+				blacklist.append(x['dari'])
+				rec = cekRute(x['ke'], tujuan, dict, blacklist)
+				if rec != []:
+					x['lalu'] = rec
+					data.append(x)
+	return data
+
+def ruteTerbaik(rute):
+	data = {}
+	for i in range(len(rute)):
+		r = rute[i]
+		jarak = 0
+		while r != None:
+			jarak += r['jarak']
+			if 'lalu' in r:
+				for x in r['lalu']:
+					r = x
+			else:
+				r = None
+		if ('jarak' not in data) or (jarak < data['jarak']):
+			data['jarak'] = jarak
+			data['rute'] = rute[i]
+	return data
+
+def printRute(data):
+	if data == {}:
+		print('Rute tidak ditemukan')
+	else:
+		rute = data['rute']
+		output = ''
+		while rute != None:
+			output += 'dari ' + rute['dari'] + ' ke ' + rute['ke']
+			if 'lalu' in rute:
+				output += ' lalu '
+				rute = rute['lalu'][0]
+			else:
+				output += ' dengan total jarak ' + str(data['jarak']) + 'km'
+				rute = None
+		print(output)
+
+		# print(data)
+
+a = input('Masukkan kota asal: ')
+while (cekAsal(a) == False):
+	print('Rute tidak ditemukan')
+	if input('Coba lagi? (y/n)') == 'y':
+		a = input('Masukkan kota asal: ')
+	else:
+		exit()
+
+b = input('Masukkan kota tujuan: ')
+printRute(ruteTerbaik(cekRute(a, b, route)))
