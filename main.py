@@ -38,7 +38,6 @@ def cekRute(asal, tujuan, dict, blacklist = []):
 	data = []
 	for x in dict:
 		if (x['dari'] == asal) and (x['ke'] not in blacklist):
-			print([x['dari'], x['ke']])
 			if x['ke'] == tujuan:
 				data.append(x)
 				break
@@ -83,8 +82,6 @@ def printRute(data):
 				output += ' dengan total jarak ' + str(data['jarak']) + 'km'
 				rute = None
 		print(output)
-
-		# print(data)
 
 a = input('Masukkan kota asal: ')
 while (cekAsal(a) == False):
