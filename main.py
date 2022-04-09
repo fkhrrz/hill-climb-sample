@@ -23,6 +23,7 @@ route = [
 	{'dari': 'bekasi', 'ke': 'jakarta', 'jarak': 35},
 	{'dari': 'bekasi', 'ke': 'bogor', 'jarak': 50},
 	{'dari': 'bekasi', 'ke': 'depok', 'jarak': 35},
+	{'dari': 'bekasi', 'ke': 'karawang', 'jarak': 35},
 ]
 
 def cekAsal(kota):
@@ -90,4 +91,7 @@ while (cekAsal(a) == False):
 		exit()
 
 b = input('Masukkan kota tujuan: ')
-printRute(ruteTerbaik(cekRute(a, b, route)))
+
+possibleRoute = cekRute(a, b, route)
+bestRoute = ruteTerbaik(possibleRoute)
+printRute(bestRoute)
