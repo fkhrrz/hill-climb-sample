@@ -1,15 +1,14 @@
 from sys import exit
 
 route = [
-	{'dari': 'jakarta', 'ke': 'depok', 'jarak': 25},
 	{'dari': 'jakarta', 'ke': 'bekasi', 'jarak': 35},
+	{'dari': 'jakarta', 'ke': 'depok', 'jarak': 25},
 	{'dari': 'jakarta', 'ke': 'tangerang', 'jarak': 35},
 
 	{'dari': 'bogor', 'ke': 'depok', 'jarak': 25},
 	{'dari': 'bogor', 'ke': 'bekasi', 'jarak': 50},
 	{'dari': 'bogor', 'ke': 'tangerang', 'jarak': 35},
 	{'dari': 'bogor', 'ke': 'cianjur', 'jarak': 50},
-	{'dari': 'bogor', 'ke': 'sukabumi', 'jarak': 50},
 
 	{'dari': 'depok', 'ke': 'jakarta', 'jarak': 25},
 	{'dari': 'depok', 'ke': 'bogor', 'jarak': 25},
@@ -24,7 +23,6 @@ route = [
 	{'dari': 'bekasi', 'ke': 'jakarta', 'jarak': 35},
 	{'dari': 'bekasi', 'ke': 'bogor', 'jarak': 50},
 	{'dari': 'bekasi', 'ke': 'depok', 'jarak': 35},
-	{'dari': 'bekasi', 'ke': 'karawang', 'jarak': 50},
 ]
 
 def cekAsal(kota):
